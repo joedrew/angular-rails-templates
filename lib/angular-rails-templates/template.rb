@@ -11,8 +11,8 @@ module AngularRailsTemplates
 
     def prepare
       @template = Tilt.new(file) { data }
+      @file = file[/(.+\.html)/]
     end
-
 
     def evaluate(scope, locals, &block)
       locals[:html] = @template.render
