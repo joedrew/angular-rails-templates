@@ -23,7 +23,7 @@ module AngularRailsTemplates
       AngularJsTemplateWrapper.render(nil, locals)
     end
 
-    private
+    protected
 
     def logical_template_path(scope)
       path = scope.logical_path.gsub /^#{configuration.ignore_prefix}/, ''
