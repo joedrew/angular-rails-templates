@@ -13,6 +13,11 @@ module AngularRailsTemplates
       @template = Tilt.new file, &block
     end
 
+    # Sprockets needs this to find assets in development
+    def context
+      @template.context
+    end
+
     def render(context, locals = {})
       locals[:html] = @template.render
       locals[:angular_template_name] = logical_template_path(context)
