@@ -31,6 +31,7 @@ class PrecompileTest < TestCase
     assert_match /\.put\("template\.html",/, contents
     assert_match /\.put\("subfolder\/template\.html",/, contents
     assert_match /\.put\("hello-world\.html",/, contents
+    assert_match /\.put\("template-name\.html",/, contents
     assert_match /\.put\("erb_template\.html",/, contents
     assert_match /\.put\("slim_template\.html",/, contents
     assert_match /\.put\("haml_template\.html",/, contents
