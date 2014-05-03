@@ -23,7 +23,7 @@ module AngularRailsTemplates
       locals[:source_file] = "#{scope.pathname}".sub(/^#{Rails.root}\//,'')
       locals[:angular_module] = configuration.module_name
 
-      AngularJsTemplateWrapper.render(scope, locals)
+      AngularJsTemplateWrapper.render(ActionView::Base.new, locals)
     end
 
     private
