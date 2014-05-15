@@ -140,4 +140,11 @@ describe "user assets integration" do
     end
   end
 
+  describe "templates with helpers" do
+    it "allows access to applicaton view helpers" do
+      visit '/assets/helpers.js'
+      page.source.must_include %Q{// source: app/assets/templates/helpers.html.haml}
+      page.source.must_include %q{app_helper_secret}
+    end
+  end
 end

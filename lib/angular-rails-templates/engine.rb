@@ -59,5 +59,13 @@ module AngularRailsTemplates
         Digest::MD5.hexdigest("#{VERSION}-#{app.config.angular_templates}")
       ].join '-'
     end
+
+    config.after_initialize do |app|
+      app.assets.context_class.class_eval do
+        include ApplicationHelper
+        include ActionView::Helpers
+        include Rails.application.routes.url_helpers
+      end
+    end
   end
 end
