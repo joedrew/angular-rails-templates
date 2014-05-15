@@ -145,6 +145,8 @@ describe "user assets integration" do
       visit '/assets/helpers.js'
       page.source.must_include %Q{// source: app/assets/templates/helpers.html.haml}
       page.source.must_include %q{app_helper_secret}
+      page.source.must_include %q{pet_dog}
+      # page.source.must_include %q{hello-render}
     end
   end
 end

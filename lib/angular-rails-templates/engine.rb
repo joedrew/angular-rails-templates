@@ -35,16 +35,26 @@ module AngularRailsTemplates
 
         # These engines render markup as HTML
         app.config.angular_templates.markups.each do |ext|
-          # Processed haml/slim templates have a mime-type of text/html.
-          # If sprockets sees a `foo.html.haml` it will process the haml
-          # and stop, because the haml output is html. Our html engine won't get run.
-          mimeless_engine = Class.new(Tilt[ext]) do
+          custom_engine = Class.new(Tilt[ext]) do
+            # Processed haml/slim templates have a mime-type of text/html.
+            # If sprockets sees a `foo.html.haml` it will process the haml
+            # and stop, because the haml output is html. Our html engine won't get run.
             def self.default_mime_type
               nil
             end
+
+            # Add helpers into the Scopes of the supported templates
+            def render(scope=Object.new, locals={}, &block)
+              scope.class_eval do
+                include ApplicationHelper
+                include ActionView::Helpers
+                include Rails.application.routes.url_helpers
+              end
+              super scope, locals || {}, &block
+            end
           end
 
-          Sprockets.register_engine ".#{ext}", mimeless_engine
+          Sprockets.register_engine ".#{ext}", custom_engine
         end
 
         # This engine wraps the HTML into JS
@@ -60,12 +70,12 @@ module AngularRailsTemplates
       ].join '-'
     end
 
-    config.after_initialize do |app|
-      app.assets.context_class.class_eval do
-        include ApplicationHelper
-        include ActionView::Helpers
-        include Rails.application.routes.url_helpers
-      end
-    end
+    # config.after_initialize do |app|
+    #   app.assets.context_class.class_eval do
+    #     include ApplicationHelper
+    #     include ActionView::Helpers
+    #     include Rails.application.routes.url_helpers
+    #   end
+    # end
   end
 end
