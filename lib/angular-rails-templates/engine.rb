@@ -25,8 +25,6 @@ module AngularRailsTemplates
 
     initializer 'angular-rails-templates' do |app|
       if app.config.assets
-        require 'sprockets'
-        require 'sprockets/engines' # load sprockets for Rails 3
 
         if app.config.angular_templates.htmlcompressor
           require 'htmlcompressor/compressor'
