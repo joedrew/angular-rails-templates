@@ -24,31 +24,47 @@ module AngularRailsTemplates
 
 
     initializer 'angular-rails-templates' do |app|
-      if app.config.assets
+      unless app.config.assets
+        warn "sprockets not enabled -- skipping angular-rails-templates"
+        return
+      end
 
-        if app.config.angular_templates.htmlcompressor
-          require 'htmlcompressor/compressor'
-          unless app.config.angular_templates.htmlcompressor.is_a? Hash
-            app.config.angular_templates.htmlcompressor = {remove_intertag_spaces: true}
+      #
+      # Setup Sprockets Engines
+      #
+
+      # These engines render markup as HTML
+      app.config.angular_templates.markups.each do |ext|
+        # Processed haml/slim templates have a mime-type of text/html.
+        # If sprockets sees a `foo.html.haml` it will process the haml
+        # and stop, because the haml output is html. Our html engine won't get run.
+        mimeless_engine = Class.new(Tilt[ext]) do
+          def self.default_mime_type
+            nil
           end
         end
 
-        # These engines render markup as HTML
-        app.config.angular_templates.markups.each do |ext|
-          # Processed haml/slim templates have a mime-type of text/html.
-          # If sprockets sees a `foo.html.haml` it will process the haml
-          # and stop, because the haml output is html. Our html engine won't get run.
-          mimeless_engine = Class.new(Tilt[ext]) do
-            def self.default_mime_type
-              nil
-            end
-          end
+        app.assets.register_engine ".#{ext}", mimeless_engine
+      end
 
-          app.assets.register_engine ".#{ext}", mimeless_engine
+      # This engine wraps the HTML into JS
+      app.assets.register_engine '.html', AngularRailsTemplates::Template
+
+      #
+      # AngularRailsTemplates Config
+      #
+
+      # Load HtmlCompressor if enabled in settings
+      if app.config.angular_templates.htmlcompressor
+        require 'htmlcompressor/compressor'
+        unless app.config.angular_templates.htmlcompressor.is_a? Hash
+          app.config.angular_templates.htmlcompressor = {remove_intertag_spaces: true}
         end
+      end
 
-        # This engine wraps the HTML into JS
-        app.assets.register_engine '.html', AngularRailsTemplates::Template
+      # Ensure ignore_prefix can be passed as a String or Array
+      if app.config.angular_templates.ignore_prefix.is_a? String
+        app.config.angular_templates.ignore_prefix = Array(app.config.angular_templates.ignore_prefix)
       end
 
       # Sprockets Cache Busting
@@ -58,14 +74,6 @@ module AngularRailsTemplates
         'ART',
         Digest::MD5.hexdigest("#{VERSION}-#{app.config.angular_templates}")
       ].join '-'
-    end
-
-
-    config.after_initialize do |app|
-      # Ensure ignore_prefix can be passed as a String or Array
-      if app.config.angular_templates.ignore_prefix.is_a? String
-        app.config.angular_templates.ignore_prefix = Array(app.config.angular_templates.ignore_prefix)
-      end
     end
   end
 end
