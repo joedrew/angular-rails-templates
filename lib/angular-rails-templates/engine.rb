@@ -24,6 +24,7 @@ module AngularRailsTemplates
 
 
     initializer 'angular-rails-templates' do |app|
+      puts app.config.assets.inspect
       unless app.config.assets
         warn "sprockets not enabled -- skipping angular-rails-templates"
         return
